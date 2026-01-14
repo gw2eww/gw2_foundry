@@ -1,0 +1,112 @@
+{
+  "_comment": "Manual overrides for skills/traits not yet updated on wiki. Applied after wiki scraper runs.",
+  "_lastUpdated": "2026-01-14",
+  "_patchNotes": "January 13, 2026 balance patch",
+
+  "traits": {
+    "Illuminating Inspiration": {
+      "wvw": {
+        "facts": [
+          {
+            "text": "Recharge Time Reduced",
+            "type": "Time",
+            "duration": 2
+          }
+        ]
+      }
+    },
+    "Glass Cannon": {
+      "wvw": {
+        "overwriteFacts": [
+          { "match": { "type": "Percent", "text": "Damage Increase" }, "set": { "percent": 5 } }
+        ]
+      }
+    },
+    "High Caliber": {
+      "wvw": {
+        "overwriteFacts": [
+          { "match": { "type": "Percent", "text": "Critical Chance Increase" }, "set": { "percent": 10 } }
+        ]
+      }
+    },
+    "Hematic Focus": {
+      "wvw": {
+        "overwriteFacts": [
+          { "match": { "type": "Percent", "text": "Critical Chance Increase" }, "set": { "percent": 5 } }
+        ]
+      }
+    },
+    "Object in Motion": {
+      "wvw": {
+        "overwriteFacts": [
+          { "match": { "type": "Percent", "text": "Damage per Boon" }, "set": { "percent": 3 } }
+        ]
+      }
+    },
+    "Applied Force": {
+      "wvw": {
+        "overwriteFacts": [
+          { "match": { "type": "AttributeAdjust", "target": "Power" }, "set": { "value": 10 } }
+        ]
+      }
+    },
+    "Life of the Party": {
+      "wvw": {
+        "overwriteFacts": [
+          { "match": { "type": "PrefixedBuff", "status": "Quickness", "prefix": "Crescendo" }, "set": { "duration": 2 } }
+        ]
+      }
+    },
+    "Enterprising Aristocrat": {
+      "wvw": {
+        "overwriteFacts": [
+          { "match": { "type": "Number", "text": "Initiative" }, "set": { "value": 1 } }
+        ]
+      },
+      "pvp": {
+        "overwriteFacts": [
+          { "match": { "type": "Number", "text": "Initiative" }, "set": { "value": 1 } }
+        ]
+      }
+    }
+  },
+
+  "skills": {
+    "Chak Shield": {
+      "wvw": {
+        "overwriteFacts": [
+          { "match": { "type": "Buff", "status": "Chak Shield" }, "set": { "description": "Your weapon skills that cost initiative refund 50% initiative." } }
+        ]
+      },
+      "pvp": {
+        "overwriteFacts": [
+          { "match": { "type": "Buff", "status": "Chak Shield" }, "set": { "description": "Your weapon skills that cost initiative refund 50% initiative." } }
+        ]
+      }
+    },
+    "Exalted Hammer": {
+      "wvw": {
+        "overwriteFacts": [
+          { "match": { "type": "AttributeAdjust", "target": "Healing" }, "set": { "value": 1300 } }
+        ]
+      },
+      "pvp": {
+        "overwriteFacts": [
+          { "match": { "type": "AttributeAdjust", "target": "Healing" }, "set": { "value": 1300 } }
+        ]
+      }
+    },
+    "Holo-Dancer Decoy": {
+      "wvw": {
+        "overwriteFacts": [
+          { "match": { "type": "Percent", "text": "Recharge Reduced" }, "set": { "percent": 33 } }
+        ]
+      },
+      "pvp": {
+        "overwriteFacts": [
+          { "match": { "type": "Percent", "text": "Recharge Reduced" }, "set": { "percent": 33 } }
+        ]
+      }
+    }
+  }
+}

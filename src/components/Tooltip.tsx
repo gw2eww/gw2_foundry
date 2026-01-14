@@ -24,15 +24,26 @@ export default function Tooltip({ content, title, icon, children, bonuses, rarit
 
   // Format a single fact for display
   const formatFact = (fact: GW2Fact): { text: string; description?: string } => {
-    // Handle PrefixedBuff facts (e.g., "Defensive Protocol: Protect")
+    // Handle PrefixedBuff facts (e.g., "Lively Lute: Quickness (6s)")
     if (fact.type === 'PrefixedBuff') {
       const prefixedFact = fact as PrefixedBuffFact;
       const prefix = prefixedFact.prefix;
       const status = prefixedFact.status;
       const description = prefixedFact.description;
+      const duration = prefixedFact.duration;
+      const applyCount = prefixedFact.apply_count;
 
-      // Use the prefix status (e.g., "Defensive Protocol: Protect") as the main text
-      const text = prefix?.status || status || fact.text || 'Buff';
+      // Build text showing prefix and the actual buff with duration
+      const prefixText = prefix?.status || '';
+      const buffText = status || fact.text || 'Buff';
+
+      let text = prefixText ? `${prefixText}: ${buffText}` : buffText;
+      if (duration !== undefined && duration > 0) {
+        text += ` (${duration}s)`;
+      }
+      if (applyCount !== undefined && applyCount > 1) {
+        text += ` ×${applyCount}`;
+      }
 
       return { text, description };
     }
@@ -78,8 +89,11 @@ export default function Tooltip({ content, title, icon, children, bonuses, rarit
     if (fact.type === 'Percent' && fact.percent !== undefined) {
       return { text: `${fact.text || 'Percent'}: ${fact.percent}%` };
     }
-    if (fact.type === 'Time' && fact.value !== undefined) {
-      return { text: `${fact.text || 'Time'}: ${fact.value}s` };
+    if (fact.type === 'Time') {
+      const timeValue = fact.duration ?? fact.value;
+      if (timeValue !== undefined) {
+        return { text: `${fact.text || 'Time'}: ${timeValue}s` };
+      }
     }
     if (fact.type === 'AttributeAdjust' && fact.value !== undefined) {
       const attrFact = fact as AttributeAdjustFact;

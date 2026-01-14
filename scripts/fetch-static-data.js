@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { enrichSkillsWithSplits, enrichTraitsWithSplits, getSplitStats } from './wiki-scraper.js';
+import { applyManualOverrides } from './apply-manual-overrides.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -405,6 +406,10 @@ async function main() {
 
       console.log('\n✅ All enrichment tasks completed!');
     }
+
+    // Apply manual overrides for balance changes not yet on wiki
+    console.log('\nApplying manual overrides...');
+    applyManualOverrides(traits, skillsByProfession);
 
     // Save data to files
     console.log('\nSaving data to files...');

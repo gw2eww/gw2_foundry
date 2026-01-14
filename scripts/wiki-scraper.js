@@ -284,6 +284,25 @@ export async function enrichTraitsWithSplits(traits, options = {}) {
 }
 
 /**
+ * Get a unique key for a fact based on its type and identifying properties
+ * @param {object} fact - Fact object
+ * @returns {string} Unique key
+ */
+function getFactKey(fact) {
+  if (fact.type === 'PrefixedBuff') {
+    return `PrefixedBuff:${fact.prefix?.status || ''}:${fact.status || ''}`;
+  }
+  if (fact.type === 'Buff') {
+    return `Buff:${fact.status || ''}`;
+  }
+  if (fact.type === 'AttributeAdjust') {
+    return `AttributeAdjust:${fact.target || fact.text || ''}`;
+  }
+  // For other types, use type + text
+  return `${fact.type}:${fact.text || ''}`;
+}
+
+/**
  * Merge wiki override into skill/trait data
  * @param {object} base - Base skill/trait from API
  * @param {object} override - Override data from wiki
@@ -297,36 +316,48 @@ function mergeOverride(base, override) {
     const baseFacts = base.facts || [];
     const overrideFacts = override.facts;
 
-    // Start with base facts
-    const mergedFacts = [...baseFacts];
+    // Create a set of fact keys that have overrides
+    // For these, we'll use ONLY the override value (not base)
+    const overrideKeys = new Set();
+    for (const fact of overrideFacts) {
+      overrideKeys.add(getFactKey(fact));
+    }
 
-    // Apply overrides (replace facts of the same type)
+    // Build merged facts
+    const seenKeys = new Set();
+    const mergedFacts = [];
+
+    // First, add override facts (these are authoritative for this mode)
     for (const overrideFact of overrideFacts) {
-      // Match by type, and for Buff/PrefixedBuff types, also match by status
-      const existingIndex = mergedFacts.findIndex(f => {
-        if (f.type !== overrideFact.type) return false;
+      const key = getFactKey(overrideFact);
+      if (seenKeys.has(key)) continue;
+      seenKeys.add(key);
 
-        // For Buff/PrefixedBuff facts, match by status (the buff name like "alacrity", "quickness")
-        if ((f.type === 'Buff' || f.type === 'PrefixedBuff') && f.status && overrideFact.status) {
-          return f.status.toLowerCase() === overrideFact.status.toLowerCase();
-        }
-
-        // For other facts, match by text if both have it
-        if (!f.text || !overrideFact.text) return true;
-        return f.text.toLowerCase() === overrideFact.text.toLowerCase();
-      });
-
-      if (existingIndex !== -1) {
-        // Replace existing fact, preserving text if override doesn't have it
-        mergedFacts[existingIndex] = {
-          ...mergedFacts[existingIndex],
+      // Find matching base fact to get icon and other properties
+      const baseFact = baseFacts.find(f => getFactKey(f) === key);
+      if (baseFact) {
+        mergedFacts.push({
+          ...baseFact,
           ...overrideFact,
-          text: overrideFact.text || mergedFacts[existingIndex].text,
-        };
+          text: overrideFact.text || baseFact.text,
+        });
       } else {
-        // Add new fact
-        mergedFacts.push(overrideFact);
+        mergedFacts.push({ ...overrideFact });
       }
+    }
+
+    // Then add base facts that DON'T have overrides (and dedupe)
+    for (const baseFact of baseFacts) {
+      const key = getFactKey(baseFact);
+
+      // Skip if this fact type has an override (we already added the override value)
+      if (overrideKeys.has(key)) continue;
+
+      // Skip if we've already seen this fact type (dedupe base facts)
+      if (seenKeys.has(key)) continue;
+      seenKeys.add(key);
+
+      mergedFacts.push({ ...baseFact });
     }
 
     merged.facts = mergedFacts;

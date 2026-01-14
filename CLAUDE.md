@@ -68,6 +68,45 @@ npm run update-data -- --with-wiki --profession=Necromancer
   - Takes ~5-7 minutes for full data generation
 - Outputs to `public/data/`: `skills.json`, `traits.json`, `specializations.json`, `items.json`, `metadata.json`
 
+### Manual Overrides System
+**Purpose:** Apply balance patch changes that haven't been updated on the wiki yet.
+
+**Files:**
+- `scripts/manual-overrides.json` - JSON file containing manual fixes for traits/skills
+- `scripts/apply-manual-overrides.js` - Script that applies overrides after wiki scraping
+
+**How it works:**
+1. After wiki scraping completes, `apply-manual-overrides.js` is called automatically
+2. It reads `manual-overrides.json` and applies the specified changes to traits/skills
+3. Supports two types of operations:
+   - **Add facts:** Add new facts to a mode's facts array
+   - **Overwrite facts:** Match existing facts by type/text and update their values
+
+**Example `manual-overrides.json` structure:**
+```json
+{
+  "traits": {
+    "Trait Name": {
+      "wvw": {
+        "facts": [{ "text": "Recharge", "type": "Time", "duration": 2 }],
+        "overwriteFacts": [{
+          "match": { "type": "Percent", "text": "Damage Increase" },
+          "set": { "percent": 5 }
+        }]
+      }
+    }
+  },
+  "skills": {
+    "Skill Name": {
+      "pvp": { "facts": [...] },
+      "wvw": { "facts": [...] }
+    }
+  }
+}
+```
+
+**When to use:** After a balance patch, if the wiki hasn't been updated with the new values, add manual overrides to ensure accurate competitive split data. Remove overrides once the wiki is updated.
+
 ### Components Structure
 **Main layout:** `src/App.tsx`
 - Left sidebar: Profession + game mode selector
